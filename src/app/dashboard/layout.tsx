@@ -22,6 +22,7 @@ import {
   User,
   FileText,
 } from "lucide-react"
+import Link from "next/link"
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: Home },
@@ -54,10 +55,10 @@ export default function DashboardLayout({
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <a href={item.href}>
+                    <Link href={item.href}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.name}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

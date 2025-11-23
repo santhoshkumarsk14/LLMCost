@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 interface DashboardData {
   totalSpend: number
@@ -132,6 +133,7 @@ async function getDashboardData() {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [data, setData] = useState<DashboardData>({
     totalSpend: 0,
     requestsCount: 0,
@@ -151,6 +153,16 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
+    // Check authentication
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/auth/login')
+        return
+      }
+    }
+
+    checkAuth()
     fetchData()
 
     // Set up real-time subscriptions
