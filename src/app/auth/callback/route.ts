@@ -29,12 +29,14 @@ export async function GET(request: Request) {
     }
   )
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  console.log('Callback: Exchanging code for session')
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {
-    console.error('Error exchanging code for session:', error)
+    console.error('Callback: Error exchanging code for session:', error)
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
+  console.log('Callback: Session exchanged successfully, user:', !!data.user)
   return NextResponse.redirect(new URL('/dashboard', request.url))
 }
