@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import AES from 'crypto-js/aes'
 import CryptoJS from 'crypto-js'
-import { encoding_for_model } from 'tiktoken'
 
 const secretKey = process.env.ENCRYPTION_SECRET!
 
@@ -24,8 +23,9 @@ function calculateCost(model: string, inputTokens: number, outputTokens: number)
   return ((inputTokens / 1000) * pricing[modelKey].input) + ((outputTokens / 1000) * pricing[modelKey].output)
 }
 
-function countTokens(text: string, model: string): number {
+async function countTokens(text: string, model: string): Promise<number> {
   try {
+    const { encoding_for_model } = await import('tiktoken')
     let encoding
     if (model.includes('gpt-4')) {
       encoding = encoding_for_model('gpt-4')
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
 
     // Calculate input tokens
     const inputText = messages.map(m => typeof m.content === 'string' ? m.content : JSON.stringify(m.content)).join(' ')
-    const inputTokens = countTokens(inputText, model)
+    const inputTokens = await countTokens(inputText, model)
 
     // Query optimization rules
     const { data: rules, error: rulesError } = await supabase
@@ -320,7 +320,7 @@ export async function POST(request: NextRequest) {
     } else if (matchedKey.provider === 'google') {
       outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
     }
-    const outputTokens = countTokens(outputText, model)
+    const outputTokens = await countTokens(outputText, model)
 
     let modelKey = 'gpt-3.5'
     if (model.includes('gpt-4')) modelKey = 'gpt-4'

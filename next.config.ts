@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import type { Configuration } from "webpack";
 
 const nextConfig: NextConfig = {
   // Image optimization settings
@@ -89,6 +88,29 @@ const nextConfig: NextConfig = {
     scrollRestoration: true,
   },
 
+  // Turbopack configuration
+  turbopack: {
+    rules: {
+      '\\.wasm$': {
+        loaders: [],
+        as: 'webassembly/async',
+      },
+    },
+  },
+
+  // Webpack configuration for WebAssembly support
+  webpack: (config) => {
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'webassembly/async',
+    });
+    return config;
+  },
+
   // Enable typed routes
   typedRoutes: true,
 
@@ -106,29 +128,6 @@ const nextConfig: NextConfig = {
 
     // Enable source maps for debugging (optional)
     productionBrowserSourceMaps: false,
-
-    // Optimize chunks
-    webpack: (config: Configuration) => {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-            },
-            radix: {
-              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-              name: 'radix-ui',
-              chunks: 'all',
-            },
-          },
-        },
-      };
-      return config;
-    },
   }),
 };
 
