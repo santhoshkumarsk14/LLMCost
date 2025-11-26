@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       const newSpend = budget.current_spend + cost_usd
 
       let status = budget.status
-      if (newSpend > budget.limit) {
+      if (newSpend > budget.budget_limit) {
         status = 'exceeded'
       }
 

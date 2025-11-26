@@ -114,7 +114,26 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
   // Send receipt notification
   console.log(`Sending receipt to user ${user.id} for invoice ${invoice.id}`)
-  // TODO: Implement actual email sending
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/notifications/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: user.id,
+        type: 'payment_receipt',
+        message: `Your payment of $${(invoice.amount_paid / 100).toFixed(2)} has been processed successfully. Invoice ID: ${invoice.id}`
+      })
+    })
+
+    if (!response.ok) {
+      console.error('Failed to send receipt notification')
+    }
+  } catch (error) {
+    console.error('Error sending receipt notification:', error)
+  }
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
@@ -133,7 +152,26 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
   // Send dunning notification
   console.log(`Sending dunning email to user ${user.id} for failed payment on invoice ${invoice.id}`)
-  // TODO: Implement actual email sending
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/notifications/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: user.id,
+        type: 'payment_failed',
+        message: `Your payment of $${(invoice.amount_due / 100).toFixed(2)} for invoice ${invoice.id} has failed. Please update your payment method to avoid service interruption.`
+      })
+    })
+
+    if (!response.ok) {
+      console.error('Failed to send dunning notification')
+    }
+  } catch (error) {
+    console.error('Error sending dunning notification:', error)
+  }
 }
 
 async function handleCustomerSubscriptionDeleted(subscription: Stripe.Subscription) {

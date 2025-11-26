@@ -13,85 +13,84 @@ import { Plus } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { toast } from "sonner"
 
 const budgetFormSchema = z.object({
   type: z.string().min(1, "Budget type is required"),
-  limit: z.number().min(0, "Limit must be positive"),
+  budgetLimit: z.number().min(0, "Limit must be positive"),
   alertThreshold: z.number().min(0).max(100, "Threshold must be between 0 and 100"),
   notificationChannels: z.array(z.string()).min(1, "At least one notification channel is required")
 })
 
 type BudgetFormData = z.infer<typeof budgetFormSchema>
 
-function getBudgetsData(): {
-  totalSpend: number
-  budgets: Budget[]
-} {
-  // Mock data for now
-  const budgets: Budget[] = [
-    {
-      id: "1",
-      type: "Monthly API Budget",
-      limit: 1000,
-      currentSpend: 650,
-      alertThreshold: 80,
-      status: "active",
-      notificationChannels: ["email", "slack"],
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-15T00:00:00Z"
-    },
-    {
-      id: "2",
-      type: "GPT-4 Budget",
-      limit: 500,
-      currentSpend: 320,
-      alertThreshold: 75,
-      status: "active",
-      notificationChannels: ["email"],
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-10T00:00:00Z"
-    },
-    {
-      id: "3",
-      type: "Development Budget",
-      limit: 200,
-      currentSpend: 180,
-      alertThreshold: 90,
-      status: "active",
-      notificationChannels: ["email", "slack"],
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-12T00:00:00Z"
-    }
-  ]
-
-  const totalSpend = budgets.reduce((sum, budget) => sum + budget.currentSpend, 0)
-
-  return {
-    totalSpend,
-    budgets
-  }
-}
-
 export default function BudgetsPage() {
-  const { totalSpend, budgets } = getBudgetsData()
+  const [budgets, setBudgets] = useState<Budget[]>([])
+  const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(budgetFormSchema),
     defaultValues: {
       type: "",
-      limit: 0,
+      budgetLimit: 0,
       alertThreshold: 80,
       notificationChannels: []
     }
   })
 
-  const onSubmit = (data: BudgetFormData) => {
-    console.log("New budget:", data)
-    // TODO: Add budget to list
-    setIsModalOpen(false)
-    form.reset()
+  const fetchBudgets = async () => {
+    try {
+      const response = await fetch('/api/budgets')
+      if (!response.ok) {
+        throw new Error('Failed to fetch budgets')
+      }
+      const data = await response.json()
+      setBudgets(data)
+    } catch (error) {
+      console.error('Error fetching budgets:', error)
+      toast.error("Failed to load budgets")
+    } finally {
+      setLoading(false)
+    }
   }
+
+  useEffect(() => {
+    fetchBudgets()
+  }, [])
+
+  const onSubmit = async (data: BudgetFormData) => {
+    try {
+      const response = await fetch('/api/budgets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: data.type,
+          limit: data.budgetLimit,
+          alertThreshold: data.alertThreshold,
+          notificationChannels: data.notificationChannels
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create budget')
+      }
+
+      const newBudget = await response.json()
+      setBudgets(prev => [newBudget, ...prev])
+      setIsModalOpen(false)
+      form.reset()
+      toast.success("Budget created successfully")
+    } catch (error) {
+      console.error('Error creating budget:', error)
+      toast.error(error instanceof Error ? error.message : "Failed to create budget")
+    }
+  }
+
+  const totalSpend = budgets.reduce((sum, budget) => sum + budget.currentSpend, 0)
 
   return (
     <div className="space-y-6">
@@ -125,7 +124,7 @@ export default function BudgetsPage() {
                 />
                 <FormField
                   control={form.control}
-                  name="limit"
+                  name="budgetLimit"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Limit Amount ($)</FormLabel>
@@ -218,44 +217,48 @@ export default function BudgetsPage() {
       </div>
 
       {/* Budgets List */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {budgets.map((budget) => (
-          <Card key={budget.id} className="backdrop-blur-md bg-card/50 border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{budget.type}</CardTitle>
-                <Badge variant={budget.status === 'active' ? 'default' : budget.status === 'paused' ? 'secondary' : 'destructive'}>
-                  {budget.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Current Spend</span>
-                  <span>${budget.currentSpend.toFixed(2)}</span>
+      {loading ? (
+        <div className="text-center py-8">Loading budgets...</div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {budgets.map((budget) => (
+            <Card key={budget.id} className="backdrop-blur-md bg-card/50 border-border/50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">{budget.type}</CardTitle>
+                  <Badge variant={budget.status === 'active' ? 'default' : budget.status === 'paused' ? 'secondary' : 'destructive'}>
+                    {budget.status}
+                  </Badge>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>Limit</span>
-                  <span>${budget.limit.toFixed(2)}</span>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Current Spend</span>
+                    <span>${budget.currentSpend.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Limit</span>
+                    <span>${budget.budgetLimit.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Alert Threshold</span>
+                    <span>{budget.alertThreshold}%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>Alert Threshold</span>
-                  <span>{budget.alertThreshold}%</span>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progress</span>
-                  <span>{((budget.currentSpend / budget.limit) * 100).toFixed(1)}%</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progress</span>
+                    <span>{((budget.currentSpend / budget.budgetLimit) * 100).toFixed(1)}%</span>
+                  </div>
+                  <Progress value={(budget.currentSpend / budget.budgetLimit) * 100} />
                 </div>
-                <Progress value={(budget.currentSpend / budget.limit) * 100} />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
--- Supabase Migration File
+-- Supabase Migration File (Fixed)
 -- This file contains the complete database schema for the LLM API cost optimization platform
+-- Sample data removed to avoid foreign key constraint errors
 
 -- ========================================
 -- Enums
@@ -63,7 +64,7 @@ CREATE TABLE budgets (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   type TEXT NOT NULL,
-  budget_limit DECIMAL(10,2) NOT NULL,
+  limit DECIMAL(10,2) NOT NULL,
   current_spend DECIMAL(10,2) DEFAULT 0,
   alert_threshold DECIMAL(5,2) NOT NULL,
   status budget_status DEFAULT 'active',
@@ -213,21 +214,3 @@ CREATE INDEX idx_budgets_type ON budgets(type);
 CREATE INDEX idx_budgets_status ON budgets(status);
 
 CREATE INDEX idx_optimization_rules_user_id ON optimization_rules(user_id);
-
-
--- ========================================
--- Idempotent Updates
--- ========================================
-
-DO $$
-BEGIN
-    -- Add savings column to api_requests if not exists
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'api_requests' AND column_name = 'savings') THEN
-        ALTER TABLE api_requests ADD COLUMN savings DECIMAL(10,4) DEFAULT 0;
-    END IF;
-
-    -- Rename savings to savings_usd in optimization_rules if exists
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'optimization_rules' AND column_name = 'savings') THEN
-        ALTER TABLE optimization_rules RENAME COLUMN savings TO savings_usd;
-    END IF;
-END $$;

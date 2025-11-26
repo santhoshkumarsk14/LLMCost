@@ -5,7 +5,7 @@ type Budget = {
   id: string
   user_id: string
   name: string
-  limit: number
+  budget_limit: number
   alert_threshold: number
   current_spend: number
   status: 'active' | 'exceeded' | 'paused'
@@ -27,7 +27,7 @@ function processBudgetUpdates(budgets: Budget[], costUsd: number): BudgetUpdate[
     const newSpend = budget.current_spend + costUsd
 
     let status = budget.status
-    if (newSpend > budget.limit) {
+    if (newSpend > budget.budget_limit) {
       status = 'exceeded'
     }
 
@@ -68,7 +68,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Monthly Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 50,
           status: 'active',
@@ -79,7 +79,7 @@ describe('Budget Threshold Checking', () => {
           id: '2',
           user_id: 'user1',
           name: 'Weekly Budget',
-          limit: 50,
+          budget_limit: 50,
           alert_threshold: 40,
           current_spend: 20,
           status: 'active',
@@ -111,7 +111,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 95,
           status: 'active',
@@ -132,7 +132,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 50,
           status: 'exceeded',
@@ -153,7 +153,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 50,
           status: 'active',
@@ -174,7 +174,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 50,
           status: 'active',
@@ -200,7 +200,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 100,
           status: 'active',
@@ -221,7 +221,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 50,
           status: 'active',
@@ -243,7 +243,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 75,
           status: 'active',
@@ -267,7 +267,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 70,
           status: 'active',
@@ -287,7 +287,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget 1',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 75,
           status: 'active',
@@ -298,7 +298,7 @@ describe('Budget Threshold Checking', () => {
           id: '2',
           user_id: 'user1',
           name: 'Budget 2',
-          limit: 50,
+          budget_limit: 50,
           alert_threshold: 40,
           current_spend: 35,
           status: 'active',
@@ -320,7 +320,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 80,
           status: 'active',
@@ -340,7 +340,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 75,
           status: 'active',
@@ -367,7 +367,7 @@ describe('Budget Threshold Checking', () => {
           id: '1',
           user_id: 'user1',
           name: 'Monthly Budget',
-          limit: 100,
+          budget_limit: 100,
           alert_threshold: 80,
           current_spend: 75,
           status: 'active',
@@ -378,7 +378,7 @@ describe('Budget Threshold Checking', () => {
           id: '2',
           user_id: 'user1',
           name: 'Already Exceeded',
-          limit: 50,
+          budget_limit: 50,
           alert_threshold: 40,
           current_spend: 60,
           status: 'exceeded',
@@ -389,7 +389,7 @@ describe('Budget Threshold Checking', () => {
           id: '3',
           user_id: 'user1',
           name: 'Safe Budget',
-          limit: 200,
+          budget_limit: 200,
           alert_threshold: 150,
           current_spend: 50,
           status: 'active',

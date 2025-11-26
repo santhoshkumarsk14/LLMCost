@@ -10,7 +10,7 @@ import type { DateRange } from "react-day-picker"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { CalendarIcon, Download, TrendingUp, TrendingDown, DollarSign, Activity, Users, Clock, AlertCircle } from "lucide-react"
+import { CalendarIcon, Download, TrendingUp, TrendingDown, DollarSign, Activity, Users, Clock, AlertCircle, Target } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Area, AreaChart } from 'recharts'
@@ -35,7 +35,8 @@ const iconMap = {
   DollarSign,
   Activity,
   TrendingUp,
-  Users
+  Users,
+  Target
 }
 
 export default function AnalyticsPage() {

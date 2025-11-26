@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +24,7 @@ import {
   User,
   FileText,
 } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: Home },
@@ -38,6 +40,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter()
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -54,11 +58,9 @@ export default function DashboardLayout({
             <SidebarMenu>
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.name}</span>
-                    </Link>
+                  <SidebarMenuButton onClick={() => router.push(item.href as any)}>
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.name}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

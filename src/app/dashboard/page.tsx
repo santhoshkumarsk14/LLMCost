@@ -98,7 +98,7 @@ async function getDashboardData() {
     }, {} as Record<string, number>) || {}
 
     const modelCostData = Object.entries(modelGrouped).map(([model, cost]) => ({ model, cost }))
-
+ 
     // Get recent requests
     const { data: recentRequests, error: recentError } = await supabase
       .from('api_requests')
@@ -107,7 +107,7 @@ async function getDashboardData() {
       .limit(5)
 
     if (recentError) throw recentError
-
+      
     return {
       totalSpend,
       requestsCount: requestsCount || 0,
@@ -153,16 +153,6 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    // Check authentication
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/auth/login')
-        return
-      }
-    }
-
-    checkAuth()
     fetchData()
 
     // Set up real-time subscriptions

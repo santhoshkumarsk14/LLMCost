@@ -1,7 +1,7 @@
 export interface Budget {
   id: string
   type: string
-  limit: number
+  budgetLimit: number
   currentSpend: number
   alertThreshold: number
   status: 'active' | 'paused' | 'exceeded'
@@ -12,7 +12,7 @@ export interface Budget {
 
 export interface BudgetFormData {
   type: string
-  limit: number
+  budgetLimit: number
   alertThreshold: number
   notificationChannels: string[]
 }

@@ -1,5 +1,32 @@
--- Supabase Migration File
+const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
+
+// Load .env.local
+const envPath = path.join(__dirname, '.env.local');
+const envContent = fs.readFileSync(envPath, 'utf8');
+const envVars = {};
+envContent.split('\n').forEach(line => {
+  const [key, value] = line.split('=');
+  if (key && value) {
+    envVars[key.trim()] = value.trim();
+  }
+});
+
+const supabaseUrl = envVars.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = envVars.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('Missing Supabase environment variables');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+const migrationSQL = `
+-- Supabase Migration File (Fixed)
 -- This file contains the complete database schema for the LLM API cost optimization platform
+-- Sample data removed to avoid foreign key constraint errors
 
 -- ========================================
 -- Enums
@@ -63,7 +90,7 @@ CREATE TABLE budgets (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   type TEXT NOT NULL,
-  budget_limit DECIMAL(10,2) NOT NULL,
+  limit DECIMAL(10,2) NOT NULL,
   current_spend DECIMAL(10,2) DEFAULT 0,
   alert_threshold DECIMAL(5,2) NOT NULL,
   status budget_status DEFAULT 'active',
@@ -213,21 +240,23 @@ CREATE INDEX idx_budgets_type ON budgets(type);
 CREATE INDEX idx_budgets_status ON budgets(status);
 
 CREATE INDEX idx_optimization_rules_user_id ON optimization_rules(user_id);
+`;
 
+async function runMigration() {
+  try {
+    console.log('Running database migration...');
 
--- ========================================
--- Idempotent Updates
--- ========================================
+    const { error } = await supabase.rpc('exec_sql', { sql: migrationSQL });
 
-DO $$
-BEGIN
-    -- Add savings column to api_requests if not exists
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'api_requests' AND column_name = 'savings') THEN
-        ALTER TABLE api_requests ADD COLUMN savings DECIMAL(10,4) DEFAULT 0;
-    END IF;
+    if (error) {
+      console.error('Migration failed:', error);
+      return;
+    }
 
-    -- Rename savings to savings_usd in optimization_rules if exists
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'optimization_rules' AND column_name = 'savings') THEN
-        ALTER TABLE optimization_rules RENAME COLUMN savings TO savings_usd;
-    END IF;
-END $$;
+    console.log('Migration completed successfully!');
+  } catch (error) {
+    console.error('Error running migration:', error);
+  }
+}
+
+runMigration();
