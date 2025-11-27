@@ -115,7 +115,7 @@ export default function OnboardingPage() {
           <p className="text-muted-foreground">{steps[currentStep].description}</p>
         </CardHeader>
         <CardContent>
-          <StepContent stepId={steps[currentStep].id} />
+          <StepContent stepId={steps[currentStep].id} onNext={nextStep} />
         </CardContent>
       </Card>
 
@@ -142,16 +142,16 @@ export default function OnboardingPage() {
   )
 }
 
-function StepContent({ stepId }: { stepId: string }) {
+function StepContent({ stepId, onNext }: { stepId: string; onNext: () => void }) {
   switch (stepId) {
     case 'welcome':
       return <WelcomeStep />
     case 'api-key':
-      return <ApiKeyStep />
+      return <ApiKeyStep onNext={onNext} />
     case 'endpoint':
       return <EndpointStep />
     case 'budget':
-      return <BudgetStep />
+      return <BudgetStep onNext={onNext} />
     case 'complete':
       return <CompleteStep />
     default:
@@ -202,7 +202,7 @@ function WelcomeStep() {
   )
 }
 
-function ApiKeyStep() {
+function ApiKeyStep({ onNext }: { onNext: () => void }) {
   const [testingConnection, setTestingConnection] = useState(false)
 
   const form = useForm<AddApiKeyForm>({
@@ -251,7 +251,7 @@ function ApiKeyStep() {
       })
       if (response.ok) {
         toast.success('API key added successfully!')
-        // Could trigger next step here
+        onNext()
       } else {
         const error = await response.json()
         toast.error(error.error || 'Failed to add API key')
@@ -465,7 +465,9 @@ curl -X POST /api/proxy \\
   )
 }
 
-function BudgetStep() {
+function BudgetStep({ onNext }: { onNext: () => void }) {
+  const [creatingBudget, setCreatingBudget] = useState(false)
+
   const budgetForm = useForm<BudgetFormData>({
     resolver: zodResolver(budgetFormSchema),
     defaultValues: {
@@ -476,10 +478,26 @@ function BudgetStep() {
     }
   })
 
-  const onBudgetSubmit = (data: BudgetFormData) => {
-    console.log("New budget:", data)
-    toast.success("Budget created successfully!")
-    // Could trigger next step here
+  const onBudgetSubmit = async (data: BudgetFormData) => {
+    setCreatingBudget(true)
+    try {
+      const response = await fetch('/api/budgets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      if (response.ok) {
+        toast.success("Budget created successfully!")
+        onNext()
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Failed to create budget')
+      }
+    } catch {
+      toast.error('Error creating budget')
+    } finally {
+      setCreatingBudget(false)
+    }
   }
 
   return (
@@ -575,7 +593,10 @@ function BudgetStep() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">Create Budget</Button>
+          <Button type="submit" className="w-full" disabled={creatingBudget}>
+            {creatingBudget ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            {creatingBudget ? 'Creating Budget...' : 'Create Budget'}
+          </Button>
         </form>
       </Form>
     </div>

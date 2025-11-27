@@ -317,7 +317,7 @@ export default function DocsPage() {
               </Card>
             </section>
 
-            {/* API Reference Placeholder */}
+            {/* API Reference */}
             <section id="api-reference" className="scroll-mt-16">
               <Card>
                 <CardHeader>
@@ -326,13 +326,402 @@ export default function DocsPage() {
                     API Reference
                   </CardTitle>
                   <CardDescription>
-                    Complete API documentation for CostLLM
+                    Complete API documentation for CostLLM endpoints
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Detailed API reference documentation will be available here. For now, please refer to the code examples above and our GitHub repository for the latest API specifications.
-                  </p>
+                <CardContent className="space-y-8">
+                  {/* Analytics API */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Analytics API</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/api/analytics</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Retrieve cost analytics and usage metrics for a specified date range.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires user authentication via Supabase session.</p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Query Parameters</h4>
+                          <ul className="text-sm text-muted-foreground list-disc list-inside">
+                            <li><code>start_date</code> (required): Start date in ISO format (YYYY-MM-DD)</li>
+                            <li><code>end_date</code> (required): End date in ISO format (YYYY-MM-DD)</li>
+                          </ul>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Response</h4>
+                          <CodeBlock code={`{
+ "metrics": [
+   {
+     "title": "Total Cost",
+     "value": "$12.34",
+     "change": "+5.2%",
+     "changeType": "positive"
+   }
+ ],
+ "costOverTime": [...],
+ "costByModel": [...],
+ "requestsByHour": [...],
+ "tokenUsage": { "total": 1234, "byModel": {...} },
+ "topRequests": [...]
+}`} language="json" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* API Keys API */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">API Keys Management</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/api/api-keys</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Retrieve all API keys for the authenticated user.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires user authentication via Supabase session.</p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Response</h4>
+                          <CodeBlock code={`[
+ {
+   "id": "uuid",
+   "provider": "openai",
+   "nickname": "Production Key",
+   "status": "active",
+   "total_requests": 150,
+   "total_cost": 25.67
+ }
+]`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/api-keys</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Create a new API key for a provider.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "provider": "openai",
+ "api_key": "sk-...",
+ "nickname": "My OpenAI Key"
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">PATCH</Badge>
+                          <code className="text-sm">/api/api-keys</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Update an API key's nickname or status.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "id": "uuid",
+ "nickname": "Updated Name",
+ "status": "inactive"
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">DELETE</Badge>
+                          <code className="text-sm">/api/api-keys</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Delete an API key.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "id": "uuid"
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/api-keys/test</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Test an API key's validity.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "api_key_id": "uuid"
+}`} language="json" />
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Response</h4>
+                          <CodeBlock code={`{
+ "success": true
+}`} language="json" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Budgets API */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Budgets Management</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/api/budgets</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Retrieve all budgets for the authenticated user.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires user authentication via Supabase session.</p>
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/budgets</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Create a new budget.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "type": "monthly",
+ "limit": 100.00,
+ "alertThreshold": 80,
+ "notificationChannels": ["email"]
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">PUT</Badge>
+                          <code className="text-sm">/api/budgets</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Update an existing budget.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "id": "uuid",
+ "type": "monthly",
+ "limit": 150.00,
+ "alertThreshold": 90,
+ "notificationChannels": ["email", "webhook"]
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">DELETE</Badge>
+                          <code className="text-sm">/api/budgets</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Delete a budget.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "id": "uuid"
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/budgets/check</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Check and update budgets after a cost transaction.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "user_id": "uuid",
+ "cost_usd": 5.67
+}`} language="json" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notifications API */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Notifications</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/notifications/send</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Send an email notification to a user.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires user authentication via Supabase session.</p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "user_id": "uuid",
+ "type": "budget_alert",
+ "message": "Your budget has exceeded the threshold"
+}`} language="json" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Proxy API */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">LLM Proxy API</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/proxy</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Proxy requests to LLM providers with cost tracking, caching, and optimization.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires API key in Authorization header: <code>Bearer your-api-key</code></p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "endpoint": "https://api.openai.com/v1/chat/completions",
+ "model": "gpt-4",
+ "messages": [
+   {
+     "role": "user",
+     "content": "Hello, world!"
+   }
+ ],
+ "max_tokens": 100
+}`} language="json" />
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Response Headers</h4>
+                          <ul className="text-sm text-muted-foreground list-disc list-inside">
+                            <li><code>X-CostLLM-Cost</code>: Cost of the request in USD</li>
+                            <li><code>X-CostLLM-Tokens</code>: Total tokens used</li>
+                            <li><code>X-CostLLM-Cached</code>: Whether response was served from cache</li>
+                          </ul>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Supported Providers</h4>
+                          <ul className="text-sm text-muted-foreground list-disc list-inside">
+                            <li>OpenAI (GPT-3.5, GPT-4)</li>
+                            <li>Anthropic (Claude-3)</li>
+                            <li>Google (Gemini)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stripe API */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Stripe Integration</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/stripe/checkout</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Create a Stripe checkout session for subscription.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Request Body</h4>
+                          <CodeBlock code={`{
+ "price_id": "price_1234567890"
+}`} language="json" />
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Response</h4>
+                          <CodeBlock code={`{
+ "url": "https://checkout.stripe.com/..."
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/stripe/portal</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Create a Stripe customer portal session.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires user authentication via Supabase session.</p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Response</h4>
+                          <CodeBlock code={`{
+ "url": "https://billing.stripe.com/..."
+}`} language="json" />
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/stripe/webhooks</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Handle Stripe webhook events for subscription management.
+                        </p>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Authentication</h4>
+                          <p className="text-sm text-muted-foreground">Requires valid Stripe webhook signature.</p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Supported Events</h4>
+                          <ul className="text-sm text-muted-foreground list-disc list-inside">
+                            <li><code>checkout.session.completed</code></li>
+                            <li><code>invoice.payment_succeeded</code></li>
+                            <li><code>invoice.payment_failed</code></li>
+                            <li><code>customer.subscription.deleted</code></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </section>

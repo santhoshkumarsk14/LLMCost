@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { supabase } from "@/lib/supabase"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -44,6 +45,7 @@ export default function AnalyticsPage() {
     from: new Date(2024, 0, 1),
     to: new Date()
   })
+  const queryClient = useQueryClient()
 
   // React Query hook for data fetching
   const { data, isLoading, error } = useQuery({
@@ -60,6 +62,24 @@ export default function AnalyticsPage() {
     },
     enabled: !!dateRange.from && !!dateRange.to
   })
+
+  useEffect(() => {
+    // Set up real-time subscriptions
+    const channel = supabase
+      .channel('analytics-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'api_requests' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['analytics', dateRange] })
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [dateRange, queryClient])
 
   const { metrics = [], costOverTime: costOverTimeData = [], costByModel: providerCostData = [], requestsByHour: requestsByHourData = [], topRequests: topRequestsData = [] } = data || {}
 

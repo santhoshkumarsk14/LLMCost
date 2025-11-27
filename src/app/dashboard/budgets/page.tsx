@@ -9,12 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus } from "lucide-react"
+import { Plus, Edit, Trash } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
+import { supabase } from "@/lib/supabase"
 
 const budgetFormSchema = z.object({
   type: z.string().min(1, "Budget type is required"),
@@ -57,6 +58,22 @@ export default function BudgetsPage() {
 
   useEffect(() => {
     fetchBudgets()
+
+    // Set up real-time subscriptions
+    const channel = supabase
+      .channel('budgets-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'budgets' },
+        () => {
+          fetchBudgets()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const onSubmit = async (data: BudgetFormData) => {

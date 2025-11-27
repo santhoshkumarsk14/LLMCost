@@ -186,6 +186,21 @@ export default function DashboardPage() {
     }
   }, [])
 
+  const exportData = () => {
+    const csv = `Model,Cost,Timestamp\n${recentRequests.map(r => `${r.model},${r.cost},${r.created_at}`).join('\n')}`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'recent-requests.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const {
     totalSpend,
     requestsCount,
@@ -211,11 +226,11 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard Overview</h1>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={exportData}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => router.push('/dashboard')}>
             <Plus className="h-4 w-4 mr-2" />
             New Request
           </Button>
@@ -352,19 +367,19 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => router.push('/dashboard/api-keys')}>
               <Plus className="h-4 w-4 mr-2" />
               Add API Key
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => router.push('/dashboard/budgets')}>
               <Settings className="h-4 w-4 mr-2" />
               Configure Budget
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => router.push('/dashboard/analytics')}>
               <TrendingUp className="h-4 w-4 mr-2" />
               View Analytics
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={exportData}>
               <Download className="h-4 w-4 mr-2" />
               Export Data
             </Button>

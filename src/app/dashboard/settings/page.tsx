@@ -41,9 +41,11 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" disabled>
-              Coming Soon
-            </Button>
+            <Link href="/dashboard/settings/notifications">
+              <Button className="w-full">
+                Manage Notifications
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
@@ -58,9 +60,11 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" disabled>
-              Coming Soon
-            </Button>
+            <Link href="/dashboard/settings/security">
+              <Button className="w-full">
+                Manage Security
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

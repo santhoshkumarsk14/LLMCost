@@ -12,10 +12,8 @@ export async function createServerSupabaseClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet: any[]) {
-          cookiesToSet.forEach(({ name, value, options }: any) => {
-            cookieStore.set(name, value, options)
-          })
+        setAll() {
+          // Cookies are not set on the server in Next.js 16 for compatibility
         },
       },
     }

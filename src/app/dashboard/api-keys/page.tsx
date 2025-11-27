@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Plus, Trash2, Key, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { supabase } from "@/lib/supabase"
 
 interface ApiKey {
   id: string
@@ -49,6 +50,22 @@ export default function ApiKeysPage() {
 
   useEffect(() => {
     fetchApiKeys()
+
+    // Set up real-time subscriptions
+    const channel = supabase
+      .channel('api-keys-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'api_keys' },
+        () => {
+          fetchApiKeys()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const fetchApiKeys = async () => {

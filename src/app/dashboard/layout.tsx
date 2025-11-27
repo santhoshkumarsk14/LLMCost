@@ -25,14 +25,15 @@ import {
   FileText,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { RealTimeNotifications } from "@/components/dashboard/real-time-notifications"
 
 const navigation = [
-  { name: "Overview", href: "/dashboard", icon: Home },
-  { name: "API Keys", href: "/dashboard/api-keys", icon: Key },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { name: "Optimization Rules", href: "/dashboard/optimization-rules", icon: FileText },
-  { name: "Budgets", href: "/dashboard/budgets", icon: DollarSign },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Overview", href: "/dashboard" as const, icon: Home },
+  { name: "API Keys", href: "/dashboard/api-keys" as const, icon: Key },
+  { name: "Analytics", href: "/dashboard/analytics" as const, icon: BarChart3 },
+  { name: "Optimization Rules", href: "/dashboard/optimization-rules" as const, icon: FileText },
+  { name: "Budgets", href: "/dashboard/budgets" as const, icon: DollarSign },
+  { name: "Settings", href: "/dashboard/settings" as const, icon: Settings },
 ]
 
 export default function DashboardLayout({
@@ -58,7 +59,7 @@ export default function DashboardLayout({
             <SidebarMenu>
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton onClick={() => router.push(item.href as any)}>
+                  <SidebarMenuButton onClick={() => router.push(item.href)}>
                     <item.icon className="h-4 w-4" />
                     <span>{item.name}</span>
                   </SidebarMenuButton>
@@ -91,6 +92,7 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-auto p-4">
           {children}
         </main>
+        <RealTimeNotifications />
       </SidebarInset>
     </SidebarProvider>
   )

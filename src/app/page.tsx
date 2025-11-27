@@ -10,13 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight, CheckCircle, DollarSign, TrendingDown, Users, Zap, Shield, BarChart3, Star } from 'lucide-react';
 
 export default function Home() {
-  const counter = useMotionValue(0);
-  const rounded = useTransform(counter, (latest) => Math.round(latest));
-
-  useEffect(() => {
-    const controls = animate(counter, 85, { duration: 2 });
-    return controls.stop;
-  }, [counter]);
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -34,13 +27,13 @@ export default function Home() {
           className="relative z-10 text-center max-w-4xl mx-auto"
         >
           <Badge variant="secondary" className="mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-slate-700 dark:text-slate-300">
-            🚀 Revolutionizing LLM Cost Management
+            💰 Smart LLM Cost Management
           </Badge>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent mb-6">
-            Optimize Your LLM Costs with CostLLM
+            Take Control of Your LLM API Costs
           </h1>
           <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
-            Reduce your AI infrastructure expenses by up to 85% with intelligent cost tracking, optimization, and real-time insights.
+            Monitor, optimize, and reduce your large language model expenses with real-time insights, intelligent routing, and automated budget controls.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
@@ -52,21 +45,6 @@ export default function Home() {
               View Pricing
             </Button>
           </div>
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md mx-auto"
-          >
-            <div className="flex items-center justify-center mb-4">
-              <TrendingDown className="h-8 w-8 text-green-500 mr-2" />
-              <span className="text-3xl font-bold text-slate-900 dark:text-white">Save up to</span>
-            </div>
-            <motion.div className="text-6xl font-bold text-green-500 mb-2">
-              <motion.span>{rounded}</motion.span>%
-            </motion.div>
-            <p className="text-slate-600 dark:text-slate-400">on your LLM costs</p>
-          </motion.div>
         </motion.div>
       </section>
 
@@ -138,10 +116,10 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-              The CostLLM Solution
+              Powerful Features for LLM Cost Control
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Comprehensive cost management platform designed specifically for LLM operations, providing real-time monitoring, optimization recommendations, and enterprise-grade security.
+              Take control of your LLM spending with advanced monitoring, intelligent routing, budget controls, and comprehensive analytics.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -149,17 +127,17 @@ export default function Home() {
               {
                 icon: Zap,
                 title: "Real-Time Monitoring",
-                description: "Track API usage, costs, and performance metrics in real-time across all your LLM deployments."
+                description: "Monitor API usage, costs, and performance metrics in real-time across all your LLM providers and deployments."
               },
               {
                 icon: TrendingDown,
-                title: "Intelligent Optimization",
-                description: "AI-powered recommendations to optimize model selection, prompt engineering, and usage patterns."
+                title: "Intelligent Routing",
+                description: "Automatically route requests to the most cost-effective models based on your requirements, performance needs, and budget constraints."
               },
               {
                 icon: Shield,
-                title: "Enterprise Security",
-                description: "Bank-level encryption, audit trails, and compliance features to protect your sensitive data."
+                title: "Budget Controls",
+                description: "Set spending limits, receive alerts, and enforce cost policies to prevent budget overruns and maintain financial control."
               }
             ].map((item, index) => (
               <motion.div
@@ -210,8 +188,8 @@ export default function Home() {
               },
               {
                 step: "02",
-                title: "Analyze & Optimize",
-                description: "Get detailed insights and AI-powered recommendations to reduce costs."
+                title: "Configure & Optimize",
+                description: "Set up intelligent routing rules, budget controls, and analytics dashboards to optimize your LLM usage."
               },
               {
                 step: "03",
@@ -327,52 +305,28 @@ export default function Home() {
               Trusted by Industry Leaders
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Join thousands of companies already optimizing their LLM costs with CostLLM.
+              Join thousands of companies optimizing their LLM costs with intelligent routing and real-time monitoring.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-blue-600 mb-2">500+</div>
-              <p className="text-slate-600 dark:text-slate-400">Companies Using CostLLM</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-green-600 mb-2">$2M+</div>
-              <p className="text-slate-600 dark:text-slate-400">Cost Savings Generated</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-purple-600 mb-2">99.9%</div>
-              <p className="text-slate-600 dark:text-slate-400">Uptime Guarantee</p>
-            </motion.div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8">
             {[
               {
-                quote: "CostLLM helped us reduce our LLM costs by 70% while maintaining performance. The insights are invaluable.",
-                author: "Sarah Johnson",
-                role: "CTO, TechCorp"
+                quote: "CostLLM helped us reduce our OpenAI API costs by 35% while maintaining response quality. The intelligent routing is a game-changer.",
+                author: "Sarah Chen",
+                title: "CTO, TechFlow Solutions",
+                company: "TechFlow Solutions"
               },
               {
-                quote: "The real-time monitoring and optimization recommendations have transformed how we manage our AI infrastructure.",
-                author: "Michael Chen",
-                role: "Head of AI, DataFlow Inc"
+                quote: "The real-time monitoring and budget controls gave us the visibility we needed to manage our AI expenses effectively across multiple teams.",
+                author: "Marcus Rodriguez",
+                title: "Head of AI, DataCorp",
+                company: "DataCorp"
+              },
+              {
+                quote: "Implementation was seamless, and the cost savings were immediate. Our developers love the analytics dashboard.",
+                author: "Emily Watson",
+                title: "VP Engineering, InnovateLabs",
+                company: "InnovateLabs"
               }
             ].map((testimonial, index) => (
               <motion.div
@@ -382,23 +336,46 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                <Card className="bg-white/10 backdrop-blur-md border border-white/20 dark:bg-slate-800/50 dark:border-slate-700">
+                <Card className="bg-white/10 backdrop-blur-md border border-white/20 dark:bg-slate-800/50 dark:border-slate-700 h-full">
                   <CardContent className="pt-6">
                     <div className="flex mb-4">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                       ))}
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400 mb-4 italic">"{testimonial.quote}"</p>
+                    <blockquote className="text-slate-600 dark:text-slate-400 mb-4 italic">
+                      "{testimonial.quote}"
+                    </blockquote>
                     <div>
-                      <p className="font-semibold text-slate-900 dark:text-white">{testimonial.author}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">{testimonial.role}</p>
+                      <div className="font-semibold text-slate-900 dark:text-white">{testimonial.author}</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">{testimonial.title}</div>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { label: "Active Users", value: "10,000+" },
+                { label: "API Calls Monitored", value: "500M+" },
+                { label: "Cost Savings", value: "$2M+" },
+                { label: "Uptime", value: "99.9%" }
+              ].map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">{stat.value}</div>
+                  <div className="text-slate-600 dark:text-slate-400">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -423,7 +400,7 @@ export default function Home() {
             {[
               {
                 question: "How does CostLLM help reduce LLM costs?",
-                answer: "CostLLM provides real-time monitoring, usage analytics, and AI-powered optimization recommendations to identify inefficiencies and suggest cost-saving measures without compromising performance."
+                answer: "CostLLM offers real-time monitoring of API usage and costs, intelligent routing to cost-effective models, automated budget controls with alerts, and comprehensive analytics to identify optimization opportunities—all while maintaining performance."
               },
               {
                 question: "Is my data secure with CostLLM?",

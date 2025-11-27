@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import AES from 'crypto-js/aes'
 import CryptoJS from 'crypto-js'
+import { proxyLogger, generateRequestId } from '@/lib/logger'
 
 const secretKey = process.env.ENCRYPTION_SECRET!
 
@@ -48,10 +49,17 @@ async function countTokens(text: string, model: string): Promise<number> {
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
+  const requestId = generateRequestId()
+
   try {
     // Extract API key from Authorization header
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      proxyLogger.warn('Missing or invalid Authorization header', {
+        request_id: requestId,
+        user_agent: request.headers.get('user-agent'),
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+      })
       return NextResponse.json({ error: 'Missing or invalid Authorization header' }, { status: 401 })
     }
     const incomingApiKey = authHeader.substring(7) // Remove 'Bearer '
@@ -79,11 +87,22 @@ export async function POST(request: NextRequest) {
     }
 
     if (!matchedKey) {
+      proxyLogger.warn('Invalid API key provided', {
+        request_id: requestId,
+        api_key_prefix: incomingApiKey.substring(0, 8) + '...',
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+      })
       return NextResponse.json({ error: 'Invalid API key' }, { status: 401 })
     }
 
-    // Rate limiting: 100 requests per minute per user
     const userId = matchedKey.user_id
+    proxyLogger.info('API key validated', {
+      request_id: requestId,
+      user_id: userId,
+      provider: matchedKey.provider
+    }, userId, matchedKey.id, requestId)
+
+    // Rate limiting: 100 requests per minute per user
     const now = Date.now()
     const windowStart = now - 60 * 1000
     let timestamps = rateLimitMap.get(userId) || []

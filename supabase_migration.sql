@@ -73,16 +73,28 @@ CREATE TABLE budgets (
 );
 
 CREATE TABLE optimization_rules (
-   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-   name TEXT NOT NULL,
-   source_model TEXT NOT NULL,
-   target_model TEXT NOT NULL,
-   conditions JSONB,
-   enabled BOOLEAN DEFAULT true,
-   savings_usd DECIMAL(10,2) DEFAULT 0,
-   created_at TIMESTAMPTZ DEFAULT NOW()
- );
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    source_model TEXT NOT NULL,
+    target_model TEXT NOT NULL,
+    conditions JSONB,
+    enabled BOOLEAN DEFAULT true,
+    savings_usd DECIMAL(10,2) DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  );
+
+CREATE TABLE audit_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  level TEXT NOT NULL,
+  message TEXT NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  api_key_id UUID REFERENCES api_keys(id) ON DELETE CASCADE,
+  request_id TEXT,
+  metadata JSONB,
+  source TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
 -- ========================================
 -- Row Level Security Policies
@@ -190,6 +202,17 @@ CREATE POLICY "Users can update own optimization_rules" ON optimization_rules
 CREATE POLICY "Users can delete own optimization_rules" ON optimization_rules
   FOR DELETE USING (auth.uid() = user_id);
 
+-- Enable RLS on audit_logs table
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Users can view their own audit_logs
+CREATE POLICY "Users can view own audit_logs" ON audit_logs
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- System can insert audit logs (service role)
+CREATE POLICY "System can insert audit_logs" ON audit_logs
+  FOR INSERT WITH CHECK (true);
+
 -- ========================================
 -- Indexes
 -- ========================================
@@ -213,6 +236,10 @@ CREATE INDEX idx_budgets_type ON budgets(type);
 CREATE INDEX idx_budgets_status ON budgets(status);
 
 CREATE INDEX idx_optimization_rules_user_id ON optimization_rules(user_id);
+CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX idx_audit_logs_level ON audit_logs(level);
+CREATE INDEX idx_audit_logs_source ON audit_logs(source);
 
 
 -- ========================================
