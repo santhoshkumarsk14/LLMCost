@@ -24,7 +24,7 @@ import {
   User,
   FileText,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { RealTimeNotifications } from "@/components/dashboard/real-time-notifications"
 
 const navigation = [
@@ -41,7 +41,6 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const router = useRouter()
 
   return (
     <SidebarProvider>
@@ -59,9 +58,11 @@ export default function DashboardLayout({
             <SidebarMenu>
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton onClick={() => router.push(item.href)}>
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.name}</span>
+                  <SidebarMenuButton asChild>
+                    <Link href={item.href as any}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.name}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
