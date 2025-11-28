@@ -28,12 +28,12 @@ import Link from "next/link"
 import { RealTimeNotifications } from "@/components/dashboard/real-time-notifications"
 
 const navigation = [
-  { name: "Overview", href: "/dashboard" as const, icon: Home },
-  { name: "API Keys", href: "/dashboard/api-keys" as const, icon: Key },
-  { name: "Analytics", href: "/dashboard/analytics" as const, icon: BarChart3 },
-  { name: "Optimization Rules", href: "/dashboard/optimization-rules" as const, icon: FileText },
-  { name: "Budgets", href: "/dashboard/budgets" as const, icon: DollarSign },
-  { name: "Settings", href: "/dashboard/settings" as const, icon: Settings },
+  { name: "Overview", href: "/dashboard", icon: Home },
+  { name: "API Keys", href: "/dashboard/api-keys", icon: Key },
+  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "Optimization Rules", href: "/dashboard/optimization-rules", icon: FileText },
+  { name: "Budgets", href: "/dashboard/budgets", icon: DollarSign },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
 export default function DashboardLayout({
